@@ -1,0 +1,31 @@
+I think I figured out why the location was coming out to be empty. The getJSON(host, url) method was pulling the JSON data from Friebase correctly. The getSignalByID() method however was manipulating the JSON to create a reference to it (namely root) and the output of the function, signalData, was a string (converting a reference to a string was resulting in the gibberish numbers we were confused about).
+
+Then functions like UmbrellaExecution() use the signalID string (now called JSONData) and try to create a JSON object reference to them by parsing through them. They are essentially parsing through a string of numbers which is why calls to LocationRoot.[something][something] returned empty strings because there were no nested arrays. I think the person who originally wrote these functions thought that root["results"] gives the string version of the result array in JSON, when it just does something weird.
+
+I think we can make two changes to fix this:
+a) We can pass around root by reference. I was confused here. Will passing aroung root itself pass the reference or the object itself? i did not want to mess around with this because of the limited 1MB memory we are working with.
+
+b) in the getSignalByID() function, we could find a way to isolate the "result" part of the JSON as a string. This will be brute force and not that elegant.
+
+Note also that getSignalByID is just once function we have seen not handle JSON data well. There could be other functions we will have to fix as well, but don't know about the errors in since the very first function is giving an error.
+__________________________________________________________
+
+If you want to access data about Wallace:
+https://gweb-paper-signals.firebaseio.com/signals/joshingly-valid-walrus.json
+
+How frequently does weather update:
+Because of a method called throttleWeatherAPI() the paper signal only polls the weather API if a new location has been requested or it has been more than 2 minutes (2 minutes stored as timeBetweenWeatherCalls in APICalls.h). 
+The paper signal keeps track of the previous weather update  with the global unsigned long lastWeatherCall
+
+Our program was losing information between the encoding and decoding of JSON.
+Helpful links:
+https://arduinojson.org/example/parser/
+
+Closer insopection of the global variable numTestServoSwings helps explain delay between test swings.
+
+Command to print a reference:
+root.printTo(Serial);
+
+
+Command to parse JSON:
+https://arduinojson.org/api/jsonbuffer/parseobject/
