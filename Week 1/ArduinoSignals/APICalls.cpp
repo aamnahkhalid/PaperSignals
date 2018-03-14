@@ -112,6 +112,8 @@ String makeLessPrettyJSON(String JSONData)
 
 void PaperSignals::StartUp()
 {
+  client.setNoDelay(1);
+  client.setTimeout(2000);
   myservo.attach(SERVO_PIN);
   MoveServoToPosition(CENTER_POSITION, 10); // Initialize
 }
@@ -693,12 +695,60 @@ void PaperSignals::StockExecution(String JSONData)
 }
 
 void PaperSignals::CustomExecution(String JSONData)
-{
+{ Serial.println("Custom got called lol");
+  Serial.println(JSONData);
   DynamicJsonBuffer customIntentBuffer;
   JsonObject& customIntentRoot = customIntentBuffer.parseObject(JSONData);
   String customIntentData = customIntentRoot["parameters"]["customParameter"];
+  
+ 
+  Serial.print("Wallace is going to move ");
+  Serial.println(customIntentData);
 
-  Serial.print("Current Custom Parameter Data: "); Serial.println(customIntentData);
+  if (customIntentData == "fast"){
+     for( int i = 0; i<11; i++)
+  {
+    MoveServoToPosition(0,5);
+    MoveServoToPosition(180, 5);
+  }
+}
+  
+  if (customIntentData == "slow"){
+        for( int i = 0; i<11; i++)
+  {
+    MoveServoToPosition(0,15);
+    MoveServoToPosition(180, 15);
+  }
+}
+  
+  if (customIntentData == "center"){
+    MoveServoToPosition(90,10);
+}
+  
+  if (customIntentData == "tango"){
+           for( int i = 0; i<11; i++)
+  {
+    MoveServoToPosition(90, 15);
+    MoveServoToPosition(0,10);
+     MoveServoToPosition(90,10);
+      MoveServoToPosition(0,10);
+      MoveServoToPosition(90,10);
+      delay(500);
+    MoveServoToPosition(180, 15);
+    MoveServoToPosition(90,10);
+    MoveServoToPosition(180, 15);
+    MoveServoToPosition(180, 15);
+  }
+  }
+  if (customIntentData == "move left"){
+        MoveServoToPosition(180,10);
+  }
+
+  if (customIntentData == "move right"){
+        MoveServoToPosition(0,10);
+  }
+
+
 }
 
 void PaperSignals::ParseIntentName(String intentName, String JSONData)
@@ -750,27 +800,14 @@ void PaperSignals::ParseIntentName(String intentName, String JSONData)
 }
 
 String PaperSignals::getSignalByID(String signalID){
-    Serial.println("Hi I started");
     char* host = "gweb-paper-signals.firebaseio.com";
     String url = "/signals/" + signalID + ".json";
 
     String payload = getJson(host, url);
-    Serial.print("payload:");
-    Serial.println( payload);
 
     DynamicJsonBuffer jsonBuffer;
-    Serial.println("This is location from parseObject() in the getSignalByID function!!!!!!!!!!!!!!___!!!!!!");
+
     JsonObject& root = jsonBuffer.parseObject(payload);
-    // Adding these to see whether the JSON data is being oulled into the object properly. Seems to be correct//
-    
- String City = root["result"]["parameters"]["location"]["city"];
-String State = root["result"]["parameters"]["location"]["admin-area"];
-String Address = root["result"]["parameters"]["location"]["street-address"];
-String MaybeAlsoACity = root["result"]["parameters"]["location"]["subadmin-area"];
-String Location = MaybeAlsoACity + " " + City + " " + State + " " + Address;
-Serial.println(Location);
-Serial.println("If you see a proper location above this, the JSON parser is working just fine");
- 
 
     // Test if parsing succeeds.
     if (!root.success()) {
@@ -782,8 +819,6 @@ Serial.println("If you see a proper location above this, the JSON parser is work
       int len = (root["result"]).measureLength();
       char signalInfo[len+1];
       (root["result"]).printTo(signalInfo, len+1);
-      Serial.println("This is signal info in the getSignalByID function*************************************************");
-      Serial.println(signalInfo);
       String intentName = root["result"]["metadata"]["intentName"];
       String intentTimeStamp = root["result"]["timestamp"];
       
@@ -795,6 +830,7 @@ Serial.println("If you see a proper location above this, the JSON parser is work
       else {
         updatedIntentTimeStamp = false;
       }
+      
       currentIntent = intentName;
       currentIntentTimeStamp = intentTimeStamp;
 
@@ -803,7 +839,6 @@ Serial.println("If you see a proper location above this, the JSON parser is work
 }
 
 String PaperSignals::getJson(String host, String url){
-    Serial.println("This is JSON");
 
     Serial.print("connecting to ");
     Serial.println(host);
@@ -895,4 +930,5 @@ void PaperSignals::RunPaperSignals()
 {
   String JSONData = getSignalByID(SignalID.c_str());
   ParseIntentName(currentIntent, JSONData);
+  Serial.println("RUN WORKED!!!!!!!!!!!!!!!!!!!!!!!!!");
 }

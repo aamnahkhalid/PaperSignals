@@ -39,6 +39,8 @@ void setup() {
     SetActionLEDOn();    
     SetConnectionLEDOff();
 
+
+
     Serial.begin(115200);
     Serial.println();
     Serial.print("connecting to ");

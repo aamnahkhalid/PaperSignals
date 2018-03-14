@@ -23,7 +23,7 @@ const String Password = "wallacegotdis";
 /* Your Signal ID should be lowercase, and each word should be separated by dashes. 
 If Google Assistant spoke too quickly, you can ask to repeat the identifier at any 
 time be saying "What is the setup code for [SIGNAL NAME]?" */
-const String SignalID = "joshingly-valid-walrus";
+const String SignalID = "wonderfully-alleged-finch";
 
 /* Enter the below API keys to track the weather on Umbrella Signal and Pants Signal. */
 const String DarkSkyAPIKey = "f24cd6035538b933026b4828ae8b9dbb";
