@@ -1,0 +1,22 @@
+{
+  "name": "silly-name-maker",
+  "description": "Find out your silly name!",
+  "version": "0.0.1",
+  "author": "Google Inc.",
+  "engines": {
+    "node": "~4.2"
+  },
+  "dependencies": {
+    "actions-on-google": "^1.0.0",
+    "firebase-admin": "^4.2.1",
+    "firebase-functions": "^0.5.7",
+    "jquery": "^3.3.1",
+    "firebase": "^4.11.0"
+  },
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "license": "ISC"
+}
