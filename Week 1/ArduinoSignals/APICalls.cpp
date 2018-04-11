@@ -115,6 +115,15 @@ void PaperSignals::StartUp()
   client.setNoDelay(1);
   client.setTimeout(2000);
   myservo.attach(SERVO_PIN);
+  
+  /*Initialise MR sensor and variables
+   */
+  pinMode(MR, INPUT);
+  lastLastRawPos = analogRead(sensorPosPin);
+  lastRawPos = analogRead(sensorPosPin);
+  flipNumber = 0;
+
+  
   MoveServoToPosition(CENTER_POSITION, 10); // Initialize
 }
 
@@ -816,10 +825,7 @@ String PaperSignals::getSignalByID(String signalID){
     }
     else
     {
-      int len = (root["result"]).measureLength();
-      char signalInfo[len+1];
-      (root["result"]).printTo(signalInfo, len+1);
-      String intentName = root["result"]["metadata"]["intentName"];
+      String intentName = root["event1"]["intentName"];
       String intentTimeStamp = root["result"]["timestamp"];
       
       if(intentTimeStamp != currentIntentTimeStamp)
@@ -931,4 +937,36 @@ void PaperSignals::RunPaperSignals()
   String JSONData = getSignalByID(SignalID.c_str());
   ParseIntentName(currentIntent, JSONData);
   Serial.println("RUN WORKED!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+//Update MR Sensor
+
+  / Get voltage output by MR sensor
+  rawPos = analogRead(sensorPosPin);  //current raw position from MR sensor
+
+  // Calculate differences between subsequent MR sensor readings
+  rawDiff = rawPos - lastRawPos;          //difference btwn current raw position and last raw position
+  lastRawDiff = rawPos - lastLastRawPos;  //difference btwn current raw position and last last raw position
+  rawOffset = abs(rawDiff);
+  lastRawOffset = abs(lastRawDiff);
+  
+  // Update position record-keeping vairables
+  lastLastRawPos = lastRawPos;
+  lastRawPos = rawPos;
+  
+  // Keep track of flips over 180 degrees
+  if((lastRawOffset > flipThresh) && (!flipped)) { // enter this anytime the last offset is greater than the flip threshold AND it has not just flipped
+    if(lastRawDiff > 0) {        // check to see which direction the drive wheel was turning
+      flipNumber--;              // cw rotation 
+    } else {                     // if(rawDiff < 0)
+      flipNumber++;              // ccw rotation
+    }
+    flipped = true;            // set boolean so that the next time through the loop won't trigger a flip
+  } else {                        // anytime no flip has occurred
+    flipped = false;
+  }
+   updatedPos = rawPos + flipNumber*OFFSET; // need to update pos based on what most recent offset is 
+   Serial.print("position: ");
+   Serial.println(updatedPos);
+   Serial.print("flip number: ");
+   Serial.println(flipNumber);
 }

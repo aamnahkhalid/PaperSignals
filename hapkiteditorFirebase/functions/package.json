@@ -1,0 +1,23 @@
+{
+  "name": "hapkit-editor",
+  "description": "Make hapkit do stuff",
+  "version": "0.0.1",
+  "author": "Parastoo Abtahi & Aamnah Khalid. Source code from Google Inc.",
+  "engines": {
+    "node": "~4.2"
+  },
+  "dependencies": {
+    "actions-on-google": "^1.0.0",
+    "firebase": "^4.11.0",
+    "firebase-admin": "^4.2.1",
+    "firebase-functions": "^0.5.7",
+    "jquery": "^3.3.1",
+    "npm": "^5.7.1"
+  },
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "private": true
+}

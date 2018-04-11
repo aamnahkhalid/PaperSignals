@@ -25,6 +25,29 @@ limitations under the License.
 
 #define SERVO_PIN 14
 
+MR senor data:
+// Position tracking variables
+int updatedPos = 0;     // keeps track of the latest updated value of the MR sensor reading
+int rawPos = 0;         // current raw reading from MR sensor
+int lastRawPos = 0;     // last raw reading from MR sensor
+int lastLastRawPos = 0; // last last raw reading from MR sensor
+int flipNumber = 0;     // keeps track of the number of flips over the 180deg mark
+int tempOffset = 0;
+int rawDiff = 0;
+int lastRawDiff = 0;
+int rawOffset = 0;
+int lastRawOffset = 0;
+const int flipThresh = 700;  // threshold to determine whether or not a flip over the 180 degree mark occurred
+boolean flipped = false;
+double OFFSET = 980;
+double OFFSET_NEG = 15;
+double const PULSE_2_TS = 0.012515;            // conversion from pulse to deg of theta sector
+double const PULSE_2_TS_OFFSET = 2.84678 - 7;  // offset theta sector
+double const DEG2RAD = PI/180;
+
+
+#define MR A0
+
 // Servo Positions and Intent specific Numbers
 
 #define CENTER_POSITION 90
@@ -71,6 +94,7 @@ public:
   ~PaperSignals() {};
 
   void StartUp();
+  void checkForEvent();
   String getJson(String host, String url);
   String getJsonHTTP(String host, String url);
   void ParseIntentName(String intentName, String JSONData);
