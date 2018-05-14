@@ -1,138 +1,67 @@
+// // New Fulfillment based on Beta v.2 Firebase
+
+
 'use strict';
-    var firebase = require("firebase");
 
-    // var config = {
-    // apiKey: "AIzaSyD-XN6r-tAl_Mf4rXO7bZuzdaNhj2zvpk4",
-    // authDomain: "hapkit-editor.firebaseapp.com",
-    // databaseURL: "https://hapkit-editor.firebaseio.com",
-    // projectId: "hapkit-editor",
-    // storageBucket: "hapkit-editor.appspot.com",
-    // messagingSenderId: "367478734991"
-    // };
-    // firebase.initializeApp(config);
-
-
-
-process.env.DEBUG = 'actions-on-google:*';
-const App = require('actions-on-google').DialogflowApp;
+const {dialogflow} = require('actions-on-google');
 const functions = require('firebase-functions');
+var firebase = require("firebase");
+const app = dialogflow({debug: true});
+
+
+//Code for updating firebase JSON
+var config = {
+    apiKey: "AIzaSyD-XN6r-tAl_Mf4rXO7bZuzdaNhj2zvpk4",
+    authDomain: "hapkit-editor.firebaseapp.com",
+    databaseURL: "https://hapkit-editor.firebaseio.com",
+    projectId: "hapkit-editor",
+    storageBucket: "hapkit-editor.appspot.com",
+    messagingSenderId: "367478734991"
+    };
+
+firebase.initializeApp(config);
+
+var database = firebase.database();
 
 
 
+app.intent('weather', (conv) => {
 
-exports.hapkitEditor = functions.https.onRequest((request, response) => {
-  const app = new App({request, response});
- 
+    var weather = conv.parameters["weather"];
+    var city = conv.parameters["geo-city"];
+    let intent_name = conv.intent;
+    let time = Date.now();
+    var n = -1;
+    const promise = firebase.database().ref('/last_event').once('value');
+    const p2 = promise.then(snapshot =>{
+        n = snapshot.val();
+    });
+        
+    //     if (n >= 6){
+    //         conv.ask("nothing is free here is current n "+ n+"what would you like to do?"); 
+    //     }
+    // });
+      
+        //     } else {
+        //         const index = n+1;
+        //         database.ref('event'+index+'/intentName').set(intent_name);
+        //         database.ref('event'+index+'/weatherIcon').set(weather);
+        //         database.ref('event'+index+'/timestamp').set(time);
+        //         database.ref('event'+index+'/city').set(city);
+        //         database.ref('event'+index+'/implemented').set(false);
+        //         database.ref('event'+index+'/tracking').set(true);
+        //         database.ref('last_pos').set(index);
+    conv.ask( `Alright, you are tracking ${weather} in ${city}! Would you like to track another weather event?.`+String(n));
+                
 
-
-// c. The function that sets weather tracking
-  function weatherTracking (app) {
-    // if (app.getUserConfirmation()) {
-    // app.tell('Great! Now repeat the action for 20 seconds so that hapkit can register it');
-    let weather_type = app.getArgument("weather");
-    let city = app.getArgument("geo-city");
-    // let timestamp = app.getDateTime();
-    // let intent_name = app.getIntent();
-
-    app.tell('Alright, your silly name is ' +
-      weather_type + ' ' + city +
-      '! I hope you like it. See you next time.');
-
-    // var database = firebase.database();
-    // database.ref('event1/intentName').set(intent_name);
-    // database.ref('event1/weatherIcon').set(weather_type);
-    // database.ref('event1/time').set(timestamp);
-    // database.ref('event1/city').set(city);
-    // database.ref('event1/tracking').set(true);
-    // database.ref('event1/implemented').set(true);
-        app.tell('Alright. Thanks for the demonstration!');
-
-    console.log('Request headers: ' + JSON.stringify(request.headers));
-     console.log('Request body: ' + JSON.stringify(request.body));
-
-
-
-
-  // } else {
-  //   app.tell('That\'s okay. Let\'s not do it now.');
-  // }
-
-  }
-
-    // c. The function that sets time tracking
-//   function dateWithoutTime (app) {
-//     if (app.getUserConfirmation()) {
-//     app.tell('Great! Now repeat the action for 20 seconds so that hapkit can register it');
-//     let day = app.getContextArgument("time_wheel", 'date');
-//     let recurring = app.getContextArgument("time_wheel", 'recurring_event' );
-//     let intent_name = app.getIntent();
-//     let recurBool = false;
-
-//     if (recurring == 'true'){
-//       recurBool=true;
-//     }
-//     let timestamp = app.getDateTime();
-
-//     var database = firebase.database();
-//     database.ref('event2/intentName').set(intent_name);
-//     database.ref('event2/date').set(day);
-//     database.ref('event2/time').set(timestamp);
-//     database.ref('event2/recurring').set(recurBool);
-//     database.ref('event2/tracking').set(true);
-//     database.ref('event2/implemented').set(true);
-
-//         app.tell('Alright. Thanks for the demonstration!');
-
-//     console.log('Request headers: ' + JSON.stringify(request.headers));
-//      console.log('Request body: ' + JSON.stringify(request.body));
-
-
-
-//   }
-//   else {
-//     app.tell('That\'s okay. Let\'s not do it now.');
-//   }
-// }
-//   function dateWithTime (app) {
-//      if (app.getUserConfirmation()) {
-//     app.tell('Great! Now repeat the action for 20 seconds so that hapkit can register it');
-//     let day = app.getContextArgument("time_wheel", 'date');
-//     let intent_name = app.getIntent();
-//     let alertTime = app.getArgument('time');
-//     let recurring = app.getContextArgument("time_wheel", 'recurring_event' );
-//     let recurBool = false;
-//     if (recurring == 'true'){
-//       recurBool=true;
-//     }
-//     let timestamp = app.getDateTime();
-
-//     var database = firebase.database();
-//     database.ref('event2/intentName').set(intent_name);
-
-//     database.ref('event3/date').set(day);
-//     database.ref('event3/time').set(alertTime);
-//     database.ref('event3/recurring').set(recurBool);
-//     database.ref('event3/tracking').set(true);
-//     database.ref('event3/implemented').set(true);
-
-//         app.tell('Alright. Thanks for the demonstration!');
-
-//     console.log('Request headers: ' + JSON.stringify(request.headers));
-//      console.log('Request body: ' + JSON.stringify(request.body));
-
-//   }else {
-//     app.tell('That\'s okay. Let\'s not do it now.');
-//   }
-// }
-
-  // d. build an action map, which maps intent names to functions
-  let actionMap = new Map();
-  actionMap.set("weather", weatherTracking);
-  // actionMap.set("time_wheel-yes", dateWithTime);
-  // actionMap.set(time_wheel-no, dateWithoutTime);
-
-
-
-
-app.handleRequest(actionMap);
+        //     }
+        // } );
+        
+    // p2.catch(error=>{
+    //     console.log(error);
+    //     conv.close("I'm having internal errors");
+    //     });
 });
+
+
+exports.hapkitEditor = functions.https.onRequest(app);

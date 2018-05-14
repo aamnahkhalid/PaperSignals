@@ -1,57 +1,21 @@
+// // Create and Deploy Your First Cloud Functions
+// // https://firebase.google.com/docs/functions/write-firebase-functions
+//
+// exports.helloWorld = functions.https.onRequest((request, response) => {
+//  response.send("Hello from Firebase!");
+// });
+
+
 'use strict';
-    var firebase = require("firebase");
 
-    // var config = {
-    // apiKey: "AIzaSyCZ1JCuclZU_XpsiFRh07OIm45Ze_zIfmk",
-    // authDomain: "sillynamemaker-7650b.firebaseapp.com",
-    // databaseURL: "https://sillynamemaker-7650b.firebaseio.com",
-    // storageBucket: "sillynamemaker-7650b.appspot.com",
-    // };
-    // firebase.initializeApp(config);
-
-
-
-process.env.DEBUG = 'actions-on-google:*';
-const App = require('actions-on-google').DialogflowApp;
+const {dialogflow} = require('actions-on-google');
 const functions = require('firebase-functions');
 
+const app = dialogflow({debug: true});
 
-// a. the action name from the make_name Dialogflow intent
-const NAME_ACTION = 'make_name';
-// b. the parameters that are parsed from the make_name intent
-const COLOR_ARGUMENT = 'geo-city';
-const NUMBER_ARGUMENT = 'number';
-
-
-exports.sillyNameMaker = functions.https.onRequest((request, response) => {
-  const app = new App({request, response});
- 
-
-// c. The function that generates the silly name
-  function makeName (app) {
-    let number = app.getArgument(NUMBER_ARGUMENT);
-    let color = app.getArgument(COLOR_ARGUMENT);
-    let time = Date();
-
-    // var database = firebase.database();
-    // database.ref('event 2').set({
-    //                             "username" : "name",
-    //                             "email" : "email",
-    //                             "profile_picture" : time
-    //                             });
-
-
-    app.tell('Alright, your silly name is ' +
-      color + ' ' + number +
-      '! I hope you like it. See you next time.');
-     console.log('Request headers: ' + JSON.stringify(request.headers));
-  console.log('Request body: ' + JSON.stringify(request.body));
-
-  }
-  // d. build an action map, which maps intent names to functions
-  let actionMap = new Map();
-  actionMap.set(NAME_ACTION, makeName);
-
-
-app.handleRequest(actionMap);
+app.intent('make_name', (conv, {color, number}) => {
+  conv.close(`Alright, your silly name is ${color} ${number}! ` +
+    `I hope you like it. See you next time. This is my seventh try at this please work`);
 });
+
+exports.sillyNameMaker = functions.https.onRequest(app);

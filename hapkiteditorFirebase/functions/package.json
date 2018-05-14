@@ -7,10 +7,10 @@
     "node": "~4.2"
   },
   "dependencies": {
-    "actions-on-google": "^1.0.0",
+    "actions-on-google": "^2.0.0",
     "firebase": "^4.11.0",
-    "firebase-admin": "^4.2.1",
-    "firebase-functions": "^0.5.7",
+    "firebase-admin": "^5.0.1",
+    "firebase-functions": "^1.0.2",
     "jquery": "^3.3.1",
     "npm": "^5.7.1"
   },
